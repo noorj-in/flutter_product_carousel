@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_product_carousel/flutter_product_carousel.dart';
 
 void main() {
   test('adds one to input values', () {
