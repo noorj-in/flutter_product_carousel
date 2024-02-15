@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_product_carousel/src/custom_widgets.dart';
 import 'package:flutter_product_carousel/src/product_carousel_controller.dart';
@@ -28,13 +29,21 @@ class Carousel extends StatefulWidget {
 }
 
 class CarouselState extends State<Carousel> {
+  /// _timer to set the timer for the auto play of the carousel images
   Timer? _timer;
 
+  /// _current to set the current index of the carousel images
   int _current = 0;
+
+  /// _isUserTouching to set the user touching state of the carousel images to enable or disable the auto play
 
   bool _isUserTouching = false;
 
+  /// scrollOffset to set the scroll offset of the carousel images to get the current index of the carousel images
   int scrollOffset = 10000;
+
+  /// _productCarouselController to set the product carousel controller for the carousel images to handle the page controller,
+  /// and to handle the next and previous page of the carousel images
 
   ProductCarouselControllerImpl? _productCarouselController;
 
@@ -81,11 +90,13 @@ class CarouselState extends State<Carousel> {
     super.dispose();
   }
 
+  /// tickTimer to set the timer for the auto play of the carousel images to move to the next image after the time interval
+  /// if the auto play is enabled
   tickTimer() {
     _timer == null
         ? _timer = Timer.periodic(
-            const Duration(
-              seconds: 2,
+            Duration(
+              seconds: widget.productCarouselOptions.autoPlayDuration.inSeconds,
             ),
             (Timer timer) {
               if (!mounted) return;
@@ -108,6 +119,9 @@ class CarouselState extends State<Carousel> {
         : null;
   }
 
+  /// cancelTimer to cancel the timer for the auto play of the carousel images
+  /// if the auto play is disabled or the user is touching the carousel images to disable the auto play and enable it again
+  /// when the user is not touching the carousel images it will enable the auto play
   cancelTimer() {
     if (_timer?.isActive == true) {
       _timer?.cancel();
@@ -115,13 +129,8 @@ class CarouselState extends State<Carousel> {
     _timer = null;
   }
 
-  resumeTimer() {
-    if (_timer?.isActive == false) {
-      tickTimer();
-    }
-  }
-
-  /// auto play is disabled by default, if you want to enable it, set autoPlay to true, and set the autoPlayTimeInterval to the duration you want to use for the auto play
+  /// auto play is disabled by default, if you want to enable it, set autoPlay to true,
+  /// and set the autoPlayTimeInterval to the duration you want to use for the auto play
   autoPlay() {
     if (widget.productCarouselOptions.autoPlay) {
       tickTimer();
@@ -189,6 +198,7 @@ class CarouselState extends State<Carousel> {
       ),
       restorationId: 'carousel',
       allowImplicitScrolling: true,
+      reverse: widget.productCarouselOptions.isReverse,
       scrollDirection: widget.productCarouselOptions.scrollDirection,
       pageSnapping: widget.productCarouselOptions.pageSnapping,
       physics: widget.productCarouselOptions.physics ??
@@ -217,13 +227,6 @@ class CarouselState extends State<Carousel> {
           ? null
           : widget.imagesList.length,
       itemBuilder: (context, index) {
-        // if (index == widget.imagesList.length - 1) {
-        //   return Center(
-        //     child: CircularProgressIndicator(
-        //       color: Colors.red.shade500,
-        //     ),
-        //   );
-        // }
         return GestureDetector(
           key: ValueKey<int>(_current),
           onTap: () {
@@ -251,29 +254,33 @@ class CarouselState extends State<Carousel> {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: MediaQuery.of(context).size.height * 0.016,
-        horizontal: MediaQuery.of(context).size.width * 0.025,
+        horizontal: MediaQuery.of(context).size.width * 0.05,
       ),
       child: Row(
         mainAxisAlignment: widget.productCarouselOptions.showNavigationIcons
             ? MainAxisAlignment.spaceBetween
             : MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.productCarouselOptions.showNavigationIcons)
+          if (widget.productCarouselOptions.showNavigationIcons ||
+              widget.productCarouselOptions.backwardIcon != null)
             InkWell(
               onTap: () {
                 _productCarouselController?.previousPage();
               },
               child: Icon(
-                defaultTargetPlatform == TargetPlatform.iOS
-                    ? Icons.arrow_back_ios
-                    : Icons.arrow_back,
-                size: 23.0,
+                widget.productCarouselOptions.backwardIcon ??
+                    (defaultTargetPlatform == TargetPlatform.iOS
+                        ? Icons.arrow_back_ios
+                        : Icons.arrow_back),
+                size: MediaQuery.of(context).size.width * 0.06,
                 color:
                     _current <= 0 ? Colors.grey.shade800 : Colors.red.shade500,
               ),
             ),
-          _buildIndicatorsWrapper(),
-          if (widget.productCarouselOptions.showNavigationIcons)
+          Expanded(child: _buildIndicatorsWrapper()),
+          if (widget.productCarouselOptions.showNavigationIcons ||
+              widget.productCarouselOptions.forwardIcon != null)
             InkWell(
               onTap: () {
                 if (_productCarouselController?.pageController?.hasClients ==
@@ -282,10 +289,11 @@ class CarouselState extends State<Carousel> {
                 }
               },
               child: Icon(
-                defaultTargetPlatform == TargetPlatform.iOS
-                    ? Icons.arrow_forward_ios
-                    : Icons.arrow_forward,
-                size: 23.0,
+                widget.productCarouselOptions.forwardIcon ??
+                    (defaultTargetPlatform == TargetPlatform.iOS
+                        ? Icons.arrow_forward_ios
+                        : Icons.arrow_forward),
+                size: MediaQuery.of(context).size.width * 0.06,
                 color: _current >= widget.imagesList.length - 1
                     ? Colors.grey.shade300
                     : Colors.red.shade500,

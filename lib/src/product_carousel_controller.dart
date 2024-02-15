@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 
 abstract class ProductCarouselController {
-
   /// Moves the page view to the next page.
+  /// [duration] is the duration of the animation.
+  /// [curve] is the curve of the animation.
   Future<void> nextPage({Duration? duration, Curve? curve});
 
   /// Moves the page view to the previous page.
+  /// [duration] is the duration of the animation.
+  /// [curve] is the curve of the animation.
   Future<void> previousPage({Duration? duration, Curve? curve});
 
   /// Factory constructor for the ProductCarouselController
