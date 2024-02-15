@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_product_carousel/src/carousel.dart';
 import 'package:flutter_product_carousel/src/custom_widgets.dart';
 import 'package:flutter_product_carousel/src/product_carousel_options.dart';
-import 'package:flutter_product_carousel/src/utills.dart';
+import 'package:flutter_product_carousel/src/utils.dart';
 
 class ProductCarousel extends StatefulWidget {
   const ProductCarousel({

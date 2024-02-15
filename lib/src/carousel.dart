@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_product_carousel/src/custom_widgets.dart';
 import 'package:flutter_product_carousel/src/product_carousel_controller.dart';
 import 'package:flutter_product_carousel/src/product_carousel_options.dart';
-import 'package:flutter_product_carousel/src/utills.dart';
+import 'package:flutter_product_carousel/src/utils.dart';
 
 class Carousel extends StatefulWidget {
   const Carousel({
@@ -38,6 +38,9 @@ class CarouselState extends State<Carousel> {
 
   ProductCarouselControllerImpl? _productCarouselController;
 
+  PageController? get pageController =>
+      _productCarouselController?.pageController;
+
   @override
   void didUpdateWidget(covariant Carousel oldWidget) {
     /// Reset the current index when the images list changes
@@ -68,14 +71,12 @@ class CarouselState extends State<Carousel> {
       initialPage: widget.productCarouselOptions.initialPage,
     );
     autoPlay();
-    // _productCarouselController?.pageController?.addListener(_pageListener);
     super.initState();
   }
 
   @override
   void dispose() {
     cancelTimer();
-    // _productCarouselController?.pageController?.removeListener(_pageListener);
     _productCarouselController?.pageController?.dispose();
     super.dispose();
   }
@@ -123,21 +124,6 @@ class CarouselState extends State<Carousel> {
       tickTimer();
     } else {
       cancelTimer();
-    }
-  }
-
-  void _pageListener() {
-    print('At the end of the page view');
-
-    if (widget.productCarouselOptions.enabledInfiniteScroll == true) {
-      // Check if we're at the end of the page view and loop back to the beginning
-      if (_productCarouselController?.pageController?.page ==
-          widget.imagesList.length - 1) {
-        _productCarouselController?.pageController?.jumpToPage(0);
-      } else if (_productCarouselController?.pageController?.page == 0) {
-        _productCarouselController?.pageController
-            ?.jumpToPage(widget.imagesList.length - 1);
-      }
     }
   }
 
@@ -272,7 +258,7 @@ class CarouselState extends State<Carousel> {
   }
 
   PageView _buildPageView(BuildContext context) {
-    return PageView(
+    return PageView.builder(
       scrollBehavior: ScrollConfiguration.of(context).copyWith(
         scrollbars: false,
         overscroll: false,
@@ -287,7 +273,7 @@ class CarouselState extends State<Carousel> {
       pageSnapping: widget.productCarouselOptions.pageSnapping,
       physics: widget.productCarouselOptions.physics ??
           const AlwaysScrollableScrollPhysics(),
-      controller: _productCarouselController?.pageController,
+      controller: pageController,
       onPageChanged: (index) {
         int newIndex = getCurrentIndex(
             index + widget.productCarouselOptions.initialPage,
@@ -296,33 +282,48 @@ class CarouselState extends State<Carousel> {
         if (widget.productCarouselOptions.onPageChanged != null) {
           widget.productCarouselOptions.onPageChanged!(index);
         }
+        if (widget.productCarouselOptions.enabledInfiniteScroll) {
+          if ((pageController?.position.pixels ?? 0.0) >=
+              (pageController?.position.maxScrollExtent ?? 0.0)) {
+            pageController?.jumpToPage(0);
+            setState(() {});
+          }
+        }
         setState(() {
           _current = newIndex;
         });
       },
-      children: widget.imagesList
-          .map(
-            (e) => GestureDetector(
-              key: ValueKey<int>(_current),
-              onTap: () {
-                widget.onTap(widget.imagesList.map((e) {
-                  return widget.imagesList.indexOf(e);
-                }).toList()[_current]);
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
-                  child: extendedImage(
-                    url: widget.imagesList[_current],
-                    width: MediaQuery.of(context).size.width,
-                    fit: widget.boxFit ?? BoxFit.fill,
-                  ),
-                ),
+      itemCount: widget.productCarouselOptions.enabledInfiniteScroll
+          ? null
+          : widget.imagesList.length,
+      itemBuilder: (context, index) {
+        // if (index == widget.imagesList.length - 1) {
+        //   return Center(
+        //     child: CircularProgressIndicator(
+        //       color: Colors.red.shade500,
+        //     ),
+        //   );
+        // }
+        return GestureDetector(
+          key: ValueKey<int>(_current),
+          onTap: () {
+            widget.onTap(widget.imagesList.map((e) {
+              return widget.imagesList.indexOf(e);
+            }).toList()[_current]);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: extendedImage(
+                url: widget.imagesList[_current],
+                width: MediaQuery.of(context).size.width,
+                fit: widget.boxFit ?? BoxFit.fill,
               ),
             ),
-          )
-          .toList(),
+          ),
+        );
+      },
     );
   }
 
