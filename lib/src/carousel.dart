@@ -84,21 +84,24 @@ class CarouselState extends State<Carousel> {
   tickTimer() {
     _timer == null
         ? _timer = Timer.periodic(
-            widget.productCarouselOptions.autoPlayTimeInterval,
+            const Duration(
+              seconds: 2,
+            ),
             (Timer timer) {
               if (!mounted) return;
+              int newIndex = 0;
               if (_current < widget.imagesList.length - 1) {
-                _current = (_productCarouselController?.pageController?.page
+                newIndex = (_productCarouselController?.pageController?.page
                             ?.round() ??
                         0) +
                     1;
               } else {
-                _current = 0;
+                newIndex = 0;
               }
               _productCarouselController?.pageController?.animateToPage(
-                _current,
+                newIndex,
                 duration: widget.productCarouselOptions.autoPlayTimeInterval,
-                curve: Curves.easeInToLinear,
+                curve: Curves.fastOutSlowIn,
               );
             },
           )
@@ -151,56 +154,7 @@ class CarouselState extends State<Carousel> {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.01,
           ),
-        if (widget.imagesList.length > 1)
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 16.0,
-              horizontal: 25.0,
-            ),
-            child: Row(
-              mainAxisAlignment:
-                  widget.productCarouselOptions.showNavigationIcons
-                      ? MainAxisAlignment.spaceBetween
-                      : MainAxisAlignment.center,
-              children: [
-                if (widget.productCarouselOptions.showNavigationIcons)
-                  InkWell(
-                    onTap: () {
-                      _productCarouselController?.previousPage();
-                    },
-                    child: Icon(
-                      defaultTargetPlatform == TargetPlatform.iOS
-                          ? Icons.arrow_back_ios
-                          : Icons.arrow_back,
-                      size: 23.0,
-                      color: _current <= 0
-                          ? Colors.grey.shade800
-                          : Colors.red.shade500,
-                    ),
-                  ),
-                _buildIndicatorsWrapper(),
-                if (widget.productCarouselOptions.showNavigationIcons)
-                  InkWell(
-                    onTap: () {
-                      if (_productCarouselController
-                              ?.pageController?.hasClients ==
-                          true) {
-                        _productCarouselController?.nextPage();
-                      }
-                    },
-                    child: Icon(
-                      defaultTargetPlatform == TargetPlatform.iOS
-                          ? Icons.arrow_forward_ios
-                          : Icons.arrow_forward,
-                      size: 23.0,
-                      color: _current >= widget.imagesList.length - 1
-                          ? Colors.grey.shade300
-                          : Colors.red.shade500,
-                    ),
-                  ),
-              ],
-            ),
-          ),
+        if (widget.imagesList.length > 1) _buildNavigatorsWithIcons(context),
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.015,
         ),
@@ -220,40 +174,6 @@ class CarouselState extends State<Carousel> {
           fit: widget.boxFit ?? BoxFit.fill,
         ),
       ),
-    );
-  }
-
-  Wrap _buildIndicatorsWrapper() {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      children: widget.imagesList.asMap().entries.map((entry) {
-        return GestureDetector(
-          onTap: () {
-            _productCarouselController?.pageController?.animateToPage(
-              entry.key,
-              duration: const Duration(microseconds: 800),
-              curve: Curves.fastOutSlowIn,
-            );
-          },
-          child: Container(
-            width: _current == entry.key ? 16.0 : 8.0,
-            height: 10.0,
-            margin: const EdgeInsets.symmetric(
-              vertical: 8.0,
-              horizontal: 4.0,
-            ),
-            decoration: BoxDecoration(
-              borderRadius:
-                  _current == entry.key ? BorderRadius.circular(8.0) : null,
-              shape:
-                  _current == entry.key ? BoxShape.rectangle : BoxShape.circle,
-              color: _current == entry.key
-                  ? Colors.red.shade500
-                  : Colors.grey.shade800,
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 
@@ -324,6 +244,89 @@ class CarouselState extends State<Carousel> {
           ),
         );
       },
+    );
+  }
+
+  Padding _buildNavigatorsWithIcons(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.height * 0.016,
+        horizontal: MediaQuery.of(context).size.width * 0.025,
+      ),
+      child: Row(
+        mainAxisAlignment: widget.productCarouselOptions.showNavigationIcons
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.center,
+        children: [
+          if (widget.productCarouselOptions.showNavigationIcons)
+            InkWell(
+              onTap: () {
+                _productCarouselController?.previousPage();
+              },
+              child: Icon(
+                defaultTargetPlatform == TargetPlatform.iOS
+                    ? Icons.arrow_back_ios
+                    : Icons.arrow_back,
+                size: 23.0,
+                color:
+                    _current <= 0 ? Colors.grey.shade800 : Colors.red.shade500,
+              ),
+            ),
+          _buildIndicatorsWrapper(),
+          if (widget.productCarouselOptions.showNavigationIcons)
+            InkWell(
+              onTap: () {
+                if (_productCarouselController?.pageController?.hasClients ==
+                    true) {
+                  _productCarouselController?.nextPage();
+                }
+              },
+              child: Icon(
+                defaultTargetPlatform == TargetPlatform.iOS
+                    ? Icons.arrow_forward_ios
+                    : Icons.arrow_forward,
+                size: 23.0,
+                color: _current >= widget.imagesList.length - 1
+                    ? Colors.grey.shade300
+                    : Colors.red.shade500,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Wrap _buildIndicatorsWrapper() {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      children: widget.imagesList.asMap().entries.map((entry) {
+        return GestureDetector(
+          onTap: () {
+            _productCarouselController?.pageController?.animateToPage(
+              entry.key,
+              duration: const Duration(microseconds: 800),
+              curve: Curves.fastOutSlowIn,
+            );
+          },
+          child: Container(
+            width: _current == entry.key ? 16.0 : 8.0,
+            height: 10.0,
+            margin: const EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 4.0,
+            ),
+            decoration: BoxDecoration(
+              borderRadius:
+                  _current == entry.key ? BorderRadius.circular(8.0) : null,
+              shape:
+                  _current == entry.key ? BoxShape.rectangle : BoxShape.circle,
+              color: _current == entry.key
+                  ? Colors.red.shade500
+                  : Colors.grey.shade800,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
