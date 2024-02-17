@@ -31,6 +31,12 @@ class ProductCarouselOptions {
 
   final IconData? forwardIcon;
 
+  /// indicatorsColor to set the color of the indicators of the product carousel by default it is set to red,
+  /// if you want to change the color of the indicators, you can set the indicatorsColor to the color you want to use for the indicators
+  /// but this color will be used for forward and backward indicator icons
+
+  final Color? indicatorsColor;
+
   /// backwardIcon to set the backward icon of the product carousel by default it will show based on platform type
   /// if platform is iOS, it will show the Icons.arrow_back_ios
   /// if platform is Android, it will show the Icons.arrow_back
@@ -54,7 +60,13 @@ class ProductCarouselOptions {
 
   final bool enabledInfiniteScroll;
 
+  /// isReverse to set the reverse of the product carousel by default it is set to false
+
   final bool isReverse;
+
+  /// showShadow to set the shadow for the product carousel by default it is set to true
+
+  final bool showShadow;
 
   /// auto play time interval to set the time interval for the auto play of the carousel images
 
@@ -63,12 +75,13 @@ class ProductCarouselOptions {
   /// auto play duration to set the duration for the auto play of the carousel images
   final Duration autoPlayDuration;
 
+  final Duration? frameChangeDuration;
   /// By default the box fit is set to fill,
   /// box fit to set the box fit of the images in the carousel widget
 
   final BoxFit? boxFit;
 
-  ///Determines the physics of the scroll
+  ///Determines the physics of the scroll view used to implement the scrolling behavior of the carousel
   final ScrollPhysics? physics;
 
   /// productCarouselController to set the controller for the product carousel
@@ -76,14 +89,22 @@ class ProductCarouselOptions {
   /// for example, you can use the controller to move to the next page or previous page
   final ProductCarouselController? productCarouselController;
 
-  ///On tap to handle the tap of the product carousel
+  ///On tap to handle the tap of the product carousel to preview the images,
+  ///if you want to use the onTap method you need to call onTap method and set the previewImages to true/false,
   final VoidCallback onTap;
 
   /// onPageChanged to handle the page change of the product carousel
   Function(int index)? onPageChanged;
 
-  //On favorite tap to handle the favorite tap
+  /// To display the favorite icon on the product carousel item, you need to provide the onFavoriteTap method
+  /// On favorite tap to handle the favorite tap of the product carousel, if you want to use the favorite tap you need to call onFavoriteTap method,
+  /// for example, you can use the onFavoriteTap to favorite the product
   final VoidCallback? onFavoriteTap;
+
+  /// To display the share icon on the product carousel item, you need to provide the onShareTap method
+  /// On share tap to handle the share tap, if you want to use the share tap ypu need to call onShareTap method,
+  /// for example, you can use the onShareTap to share the product details
+  final VoidCallback? onShareTap;
 
   ProductCarouselOptions({
     this.height,
@@ -95,18 +116,22 @@ class ProductCarouselOptions {
     this.previewImages = false,
     this.showNavigationIcons = false,
     this.isReverse = false,
+    this.showShadow = true,
     this.isFavorite,
     this.forwardIcon,
     this.backwardIcon,
+    this.indicatorsColor = Colors.redAccent,
     this.autoPlay = false,
     this.enabledInfiniteScroll = false,
     this.autoPlayTimeInterval = const Duration(milliseconds: 1000),
     this.autoPlayDuration = const Duration(seconds: 3),
+    this.frameChangeDuration = const Duration(milliseconds: 90),
     this.boxFit = BoxFit.fill,
     this.physics,
     this.productCarouselController,
     this.onPageChanged,
     required this.onTap,
-    required this.onFavoriteTap,
+    this.onFavoriteTap,
+    this.onShareTap,
   });
 }

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_product_carousel/src/custom_widgets.dart';
+import 'package:flutter_product_carousel/src/product_360_view.dart';
 import 'package:flutter_product_carousel/src/product_carousel_controller.dart';
 import 'package:flutter_product_carousel/src/product_carousel_options.dart';
 import 'package:flutter_product_carousel/src/utils.dart';
@@ -13,6 +13,7 @@ class Carousel extends StatefulWidget {
   const Carousel({
     super.key,
     required this.imagesList,
+    this.multiImagesList,
     required this.productCarouselOptions,
     required this.onTap,
     this.boxFit,
@@ -20,6 +21,9 @@ class Carousel extends StatefulWidget {
   });
 
   final List<String> imagesList;
+
+  final List<ImageProvider>? multiImagesList;
+
   final ProductCarouselOptions productCarouselOptions;
   final Function(int index) onTap;
   final BoxFit? boxFit;
@@ -50,6 +54,9 @@ class CarouselState extends State<Carousel> {
   PageController? get pageController =>
       _productCarouselController?.pageController;
 
+  /// view360DegreeView to view the image in 360° view
+  bool view360DegreeView = false;
+
   @override
   void didUpdateWidget(covariant Carousel oldWidget) {
     /// Reset the current index when the images list changes
@@ -58,7 +65,7 @@ class CarouselState extends State<Carousel> {
         _current = 0;
       });
     }
-    autoPlay();
+    widget.multiImagesList?.isNotEmpty == true ? cancelTimer() : autoPlay();
 
     /// Reset the page controller when the product carousel options change
     _productCarouselController?.pageController = PageController(
@@ -71,6 +78,8 @@ class CarouselState extends State<Carousel> {
   @override
   initState() {
     /// Set the initial page and viewport fraction when the widget is initialized
+    widget.multiImagesList?.isNotEmpty == true ? cancelTimer() : autoPlay();
+    view360DegreeView = false;
     _productCarouselController =
         widget.productCarouselOptions is ProductCarouselControllerImpl
             ? widget.productCarouselOptions as ProductCarouselControllerImpl
@@ -79,7 +88,7 @@ class CarouselState extends State<Carousel> {
       viewportFraction: widget.productCarouselOptions.viewportFraction,
       initialPage: widget.productCarouselOptions.initialPage,
     );
-    autoPlay();
+
     super.initState();
   }
 
@@ -141,34 +150,49 @@ class CarouselState extends State<Carousel> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        widget.imagesList.isEmpty
-            ? _buildCarouselEmptyState(context)
-            : GestureDetector(
-                onTap: () {
-                  if (_isUserTouching) {
-                    autoPlay();
-                  } else {
-                    _timer?.cancel();
-                  }
-                  _isUserTouching = !_isUserTouching;
-                },
-                child: getWrapper(
-                  _buildPageView(context),
+    if (view360DegreeView == true) {
+      return ProductImage360View(
+        key: UniqueKey(),
+        imageList: widget.multiImagesList ?? [],
+        frameChangeDuration:
+            widget.productCarouselOptions.frameChangeDuration ??
+                const Duration(milliseconds: 90),
+        onCloseTap: (bool value) {
+          setState(() {
+            view360DegreeView = value;
+          });
+        },
+      );
+    } else {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          widget.imagesList.isEmpty
+              ? _buildCarouselEmptyState(context)
+              : GestureDetector(
+                  onTap: () {
+                    if (_isUserTouching) {
+                      autoPlay();
+                    } else {
+                      _timer?.cancel();
+                    }
+                    _isUserTouching = !_isUserTouching;
+                  },
+                  child: getWrapper(
+                    _buildPageView(context),
+                  ),
                 ),
-              ),
-        if (widget.imagesList.length > 1)
+          if (widget.imagesList.length > 1)
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.01,
+            ),
+          if (widget.imagesList.length > 1) _buildNavigatorsWithIcons(context),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.01,
+            height: MediaQuery.of(context).size.height * 0.015,
           ),
-        if (widget.imagesList.length > 1) _buildNavigatorsWithIcons(context),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.015,
-        ),
-      ],
-    );
+        ],
+      );
+    }
   }
 
   Padding _buildCarouselEmptyState(BuildContext context) {
@@ -223,10 +247,52 @@ class CarouselState extends State<Carousel> {
           _current = newIndex;
         });
       },
-      itemCount: widget.productCarouselOptions.enabledInfiniteScroll
-          ? null
-          : widget.imagesList.length,
+      itemCount: widget.multiImagesList?.isNotEmpty == true
+          ? widget.imagesList.length + 1
+          : widget.productCarouselOptions.enabledInfiniteScroll
+              ? null
+              : widget.imagesList.length,
       itemBuilder: (context, index) {
+        if (widget.multiImagesList?.isNotEmpty == true && _current == 0) {
+          return Stack(
+            children: [
+              Image(image: widget.multiImagesList![_current]),
+              Positioned(
+                bottom: 10.0,
+                right: 10.0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.008,
+                    horizontal: MediaQuery.of(context).size.width * 0.04,
+                  ),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(
+                        color: Colors.red.shade800,
+                        width: 2.0,
+                      ),
+                      shape: BoxShape.rectangle),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        view360DegreeView = true;
+                      });
+                    },
+                    child: Text(
+                      '360° View',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: MediaQuery.of(context).size.width * 0.04,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
         return GestureDetector(
           key: ValueKey<int>(_current),
           onTap: () {
@@ -274,8 +340,10 @@ class CarouselState extends State<Carousel> {
                         ? Icons.arrow_back_ios
                         : Icons.arrow_back),
                 size: MediaQuery.of(context).size.width * 0.06,
-                color:
-                    _current <= 0 ? Colors.grey.shade800 : Colors.red.shade500,
+                color: _current <= 0
+                    ? Colors.grey.shade800
+                    : widget.productCarouselOptions.indicatorsColor ??
+                        Colors.red.shade500,
               ),
             ),
           Expanded(child: _buildIndicatorsWrapper()),
@@ -296,7 +364,8 @@ class CarouselState extends State<Carousel> {
                 size: MediaQuery.of(context).size.width * 0.06,
                 color: _current >= widget.imagesList.length - 1
                     ? Colors.grey.shade300
-                    : Colors.red.shade500,
+                    : widget.productCarouselOptions.indicatorsColor ??
+                        Colors.red.shade500,
               ),
             ),
         ],
@@ -317,11 +386,13 @@ class CarouselState extends State<Carousel> {
             );
           },
           child: Container(
-            width: _current == entry.key ? 16.0 : 8.0,
-            height: 10.0,
-            margin: const EdgeInsets.symmetric(
-              vertical: 8.0,
-              horizontal: 4.0,
+            width: _current == entry.key
+                ? MediaQuery.of(context).size.width * 0.04
+                : MediaQuery.of(context).size.width * 0.02,
+            height: MediaQuery.of(context).size.height * 0.01,
+            margin: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.005,
+              horizontal: MediaQuery.of(context).size.width * 0.007,
             ),
             decoration: BoxDecoration(
               borderRadius:
@@ -329,7 +400,8 @@ class CarouselState extends State<Carousel> {
               shape:
                   _current == entry.key ? BoxShape.rectangle : BoxShape.circle,
               color: _current == entry.key
-                  ? Colors.red.shade500
+                  ? widget.productCarouselOptions.indicatorsColor ??
+                      Colors.red.shade500
                   : Colors.grey.shade800,
             ),
           ),
