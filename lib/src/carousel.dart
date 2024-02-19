@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_product_carousel/src/custom_widgets.dart';
 import 'package:flutter_product_carousel/src/product_360_view.dart';
