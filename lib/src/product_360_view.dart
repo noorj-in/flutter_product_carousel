@@ -1,5 +1,3 @@
-library imageview360;
-
 import 'dart:math';
 import 'package:flutter/material.dart';
 
@@ -13,80 +11,111 @@ class ProductImage360View extends StatefulWidget {
 
   final List<ImageProvider> imageList;
 
-  // By default true. If set to false, the gestures to rotate the image will be disabed.
+  /// frameChangeDuration to set the duration for the frame change of the 360 degree view of the product
 
-  // By default 1. Based on the value the frameSensitivity of swipe gesture increases and decreases proportionally
-
-  // By default Duration(milliseconds: 80). The time interval between shifting from one image frame to other.
   final Duration frameChangeDuration;
 
+  /// onCloseTap to provide the callback function to close the 360 degree view of the product
   final Function(bool) onCloseTap;
-
-  // Callback function to provide you the index of current image when image frame is changed.
 
   @override
   State<ProductImage360View> createState() => _ProductImage360ViewState();
 }
 
-class _ProductImage360ViewState extends State<ProductImage360View> {
-  String? assetImage;
+class _ProductImage360ViewState extends State<ProductImage360View>
+    with TickerProviderStateMixin {
+  AnimationController? _controller;
+  Animation<double>? _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 2000),
+        vsync: this,
+        value: 0,
+        lowerBound: 0,
+        upperBound: 1);
+    _animation =
+        CurvedAnimation(parent: _controller!, curve: Curves.fastOutSlowIn);
+    _controller?.forward();
+  }
+
+  @override
+  dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  /// rotationIndex to set the index of the image in the list of images for the 360 degree view of the product
   int rotationIndex = 0;
+
+  /// frameSensitivity to set the sensitivity of the frame change of the 360 degree view of the product
   int frameSensitivity = 2;
+
+  /// localPosition to set the local position of the frame change of the 360 degree view of the product
   double localPosition = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          children: <Widget>[
-            Expanded(
-              child: GestureDetector(
-                onHorizontalDragEnd: (details) {
-                  localPosition = 0.0;
-                },
-                onVerticalDragEnd: (details) {
-                  localPosition = 0.0;
-                },
-                onHorizontalDragUpdate: (details) {
-                  if (details.delta.dx > 0) {
-                    handlePositive180DegreeRotation(details);
-                  } else if (details.delta.dx < 0) {
-                    handleNegative180DegreeRotation(details);
-                  }
-                },
-                onVerticalDragUpdate: (details) {
-                  if (details.delta.dy > 0) {
-                    handlePositive180DegreeRotation(details, isVertical: true);
-                  } else if (details.delta.dy < 0) {
-                    handleNegative180DegreeRotation(details, isVertical: true);
-                  }
-                },
-                child: Image(
-                  image: widget.imageList[rotationIndex],
-                  gaplessPlayback: true,
-                  fit: BoxFit.contain,
+    return FadeTransition(
+      opacity: _animation!,
+      child: Stack(
+        children: [
+          Column(
+            children: <Widget>[
+              Expanded(
+                child: GestureDetector(
+                  onHorizontalDragEnd: (details) {
+                    localPosition = 0.0;
+                  },
+                  onVerticalDragEnd: (details) {
+                    localPosition = 0.0;
+                  },
+                  onHorizontalDragUpdate: (details) {
+                    if (details.delta.dx > 0) {
+                      handlePositive180DegreeRotation(details);
+                    } else if (details.delta.dx < 0) {
+                      handleNegative180DegreeRotation(details);
+                    }
+                  },
+                  onVerticalDragUpdate: (details) {
+                    if (details.delta.dy > 0) {
+                      handlePositive180DegreeRotation(details,
+                          isVertical: true);
+                    } else if (details.delta.dy < 0) {
+                      handleNegative180DegreeRotation(details,
+                          isVertical: true);
+                    }
+                  },
+                  child: Image(
+                    image: widget.imageList[rotationIndex],
+                    gaplessPlayback: true,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        Positioned(
-          top: 10.0,
-          left: 10.0,
-          child: IconButton(
-            onPressed: () => widget.onCloseTap(false),
-            icon: Icon(
-              Icons.close_outlined,
-              color: Colors.black.withOpacity(0.5),
-              size: MediaQuery.of(context).size.height * 0.04,
+            ],
+          ),
+          Positioned(
+            top: 10.0,
+            left: 10.0,
+            child: IconButton(
+              onPressed: () => widget.onCloseTap(false),
+              icon: Icon(
+                Icons.close_outlined,
+                color: Colors.black.withOpacity(0.5),
+                size: MediaQuery.of(context).size.height * 0.04,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
+  /// handlePositive180DegreeRotation to handle the positive 180 degree rotation of the 360 degree view of the product
+  /// details to get the details of the drag update of the 360 degree view of the product
   Future<void> handlePositive180DegreeRotation(DragUpdateDetails details,
       {bool isVertical = false}) async {
     int? currentIndex = rotationIndex;
@@ -98,7 +127,6 @@ class _ProductImage360ViewState extends State<ProductImage360View> {
       localPosition =
           isVertical ? details.localPosition.dy : details.localPosition.dx;
     }
-    // Check to ignore rebuild of widget is index is same
     if (currentIndex != rotationIndex) {
       setState(() {
         if (rotationIndex < widget.imageList.length - 1) {
@@ -110,6 +138,8 @@ class _ProductImage360ViewState extends State<ProductImage360View> {
     }
   }
 
+  /// handleNegative180DegreeRotation to handle the negative 180 degree rotation of the 360 degree view of the product
+  /// details to get the details of the drag update of the 360 degree view of the product
   Future<void> handleNegative180DegreeRotation(DragUpdateDetails details,
       {bool isVertical = false}) async {
     double distanceDifference =
@@ -127,7 +157,6 @@ class _ProductImage360ViewState extends State<ProductImage360View> {
       localPosition =
           isVertical ? details.localPosition.dy : details.localPosition.dx;
     }
-    // Check to ignore rebuild of widget is index is same
     if (currentIndex != rotationIndex) {
       setState(() {
         if (rotationIndex > 0) {
