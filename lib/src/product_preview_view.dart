@@ -4,15 +4,17 @@ import 'package:flutter_product_carousel/src/product_carousel_options.dart';
 import 'package:flutter_product_carousel/src/utils.dart';
 
 class ProductPreview extends StatefulWidget {
-  const ProductPreview(
-      {super.key,
-      required this.imagesList,
-      required this.carouselOptions,
-      this.multiImagesList});
+  const ProductPreview({
+    super.key,
+    required this.imagesList,
+    required this.carouselOptions,
+  });
+
+  /// imagesList to set the list of images for the product preview
 
   final List<String> imagesList;
 
-  final List<ImageProvider>? multiImagesList;
+  /// carouselOptions to set the options for the product carousel
 
   final ProductCarouselOptions carouselOptions;
 
@@ -103,6 +105,7 @@ class _ProductPreviewState extends State<ProductPreview>
                 color: Colors.grey.shade100,
                 child: buildHorizontalProductsImages(
                   imagesList: widget.imagesList,
+                  borderRadius: 15.0,
                   onTap: (index) {
                     setState(() {
                       assetImage = widget.imagesList[index];

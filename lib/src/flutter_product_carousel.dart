@@ -94,7 +94,6 @@ class ProductCarouselState extends State<ProductCarousel> {
     } else {
       return ProductPreview(
         imagesList: widget.imagesList,
-        multiImagesList: widget.multiImagesList ?? [],
         carouselOptions: widget.carouselOptions,
       );
     }

@@ -20,12 +20,27 @@ class Carousel extends StatefulWidget {
     ProductCarouselController? productCarouselController,
   });
 
+  /// imagesList to set the list of the carousel images to display the images in the carousel
+  /// it is required and must not be null
+
   final List<String> imagesList;
 
+  /// multiImagesList to set the list of the carousel images to display the images in the 360° view
+  /// if it is not null, it will show the 360° view button to view the images in 360° view
+  /// otherwise, it will not show the 360° view button
+  /// when you are using the multiImagesList, you must provide sequence[example: [image1.jpg, image2.jpg, image3.jpg/png/..]images to view the images in 360° view
   final List<ImageProvider>? multiImagesList;
 
+  /// productCarouselOptions to set the product carousel options for the carousel images
+
   final ProductCarouselOptions productCarouselOptions;
+
+  /// onTap to set the function to handle the tap event of the carousel images
+  /// it will set the image on which index the user has tapped
+  /// based on the index, you can handle the tap event of the carousel images
   final Function(int index) onTap;
+
+  /// boxFit to set the box fit of the carousel images
   final BoxFit? boxFit;
 
   @override
@@ -65,7 +80,7 @@ class CarouselState extends State<Carousel> {
         _current = 0;
       });
     }
-    widget.multiImagesList?.isNotEmpty == true ? cancelTimer() : autoPlay();
+    autoPlay();
 
     /// Reset the page controller when the product carousel options change
     _productCarouselController?.pageController = PageController(
@@ -78,7 +93,6 @@ class CarouselState extends State<Carousel> {
   @override
   initState() {
     /// Set the initial page and viewport fraction when the widget is initialized
-    widget.multiImagesList?.isNotEmpty == true ? cancelTimer() : autoPlay();
     view360DegreeView = false;
     _productCarouselController =
         widget.productCarouselOptions is ProductCarouselControllerImpl
@@ -88,7 +102,8 @@ class CarouselState extends State<Carousel> {
       viewportFraction: widget.productCarouselOptions.viewportFraction,
       initialPage: widget.productCarouselOptions.initialPage,
     );
-
+    autoPlay();
+    _isUserTouching = widget.productCarouselOptions.autoPlay;
     super.initState();
   }
 
@@ -110,6 +125,9 @@ class CarouselState extends State<Carousel> {
             (Timer timer) {
               if (!mounted) return;
               int newIndex = 0;
+
+              /// Move to the next image if the current index is less than the length of the images list
+              /// otherwise, move to the first image
               if (_current < widget.imagesList.length - 1) {
                 newIndex = (_productCarouselController?.pageController?.page
                             ?.round() ??
@@ -172,11 +190,13 @@ class CarouselState extends State<Carousel> {
               : GestureDetector(
                   onTap: () {
                     if (_isUserTouching) {
-                      autoPlay();
+                      cancelTimer();
                     } else {
-                      _timer?.cancel();
+                      autoPlay();
                     }
-                    _isUserTouching = !_isUserTouching;
+                    setState(() {
+                      _isUserTouching = !_isUserTouching;
+                    });
                   },
                   child: getWrapper(
                     _buildPageView(context),
@@ -195,6 +215,8 @@ class CarouselState extends State<Carousel> {
     }
   }
 
+  /// _buildCarouselEmptyState to build the empty state of the carousel images
+  /// if the images list is empty
   Padding _buildCarouselEmptyState(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -210,6 +232,7 @@ class CarouselState extends State<Carousel> {
     );
   }
 
+  /// _buildPageView to build the page view of the carousel images to swipe the images horizontally
   PageView _buildPageView(BuildContext context) {
     return PageView.builder(
       scrollBehavior: ScrollConfiguration.of(context).copyWith(
@@ -253,10 +276,31 @@ class CarouselState extends State<Carousel> {
               ? null
               : widget.imagesList.length,
       itemBuilder: (context, index) {
-        if (widget.multiImagesList?.isNotEmpty == true && _current == 0) {
-          return Stack(
-            children: [
-              Image(image: widget.multiImagesList![_current]),
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20.0),
+                child: GestureDetector(
+                  key: ValueKey<int>(_current),
+                  onTap: () {
+                    widget.onTap(widget.imagesList.map((e) {
+                      return widget.imagesList.indexOf(e);
+                    }).toList()[_current]);
+                  },
+                  child: extendedImage(
+                    url: widget.imagesList[_current],
+                    width: MediaQuery.of(context).size.width,
+                    fit: widget.boxFit ?? BoxFit.fill,
+                  ),
+                ),
+              ),
+            ),
+
+            /// Show 360° View button if the multiImagesList is not empty and the current index is 0
+            if ((widget.multiImagesList ?? []).isNotEmpty && _current == 0) ...[
               Positioned(
                 bottom: 10.0,
                 right: 10.0,
@@ -290,32 +334,17 @@ class CarouselState extends State<Carousel> {
                   ),
                 ),
               ),
-            ],
-          );
-        }
-        return GestureDetector(
-          key: ValueKey<int>(_current),
-          onTap: () {
-            widget.onTap(widget.imagesList.map((e) {
-              return widget.imagesList.indexOf(e);
-            }).toList()[_current]);
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: extendedImage(
-                url: widget.imagesList[_current],
-                width: MediaQuery.of(context).size.width,
-                fit: widget.boxFit ?? BoxFit.fill,
-              ),
-            ),
-          ),
+            ]
+          ],
         );
       },
     );
   }
 
+  /// _buildNavigatorsWithIcons to build the navigators with icons of the carousel images
+  /// to navigate to the next and previous images of the carousel images
+  /// if the showNavigationIcons is enabled, it will show the navigation icons
+  /// otherwise, it will show the indicators of the carousel images
   Padding _buildNavigatorsWithIcons(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -373,6 +402,8 @@ class CarouselState extends State<Carousel> {
     );
   }
 
+  /// _buildIndicatorsWrapper to build the indicators of the carousel images
+  /// to navigate to the specific image of the carousel images by tapping on the indicators
   Wrap _buildIndicatorsWrapper() {
     return Wrap(
       alignment: WrapAlignment.center,
@@ -402,7 +433,7 @@ class CarouselState extends State<Carousel> {
               color: _current == entry.key
                   ? widget.productCarouselOptions.indicatorsColor ??
                       Colors.red.shade500
-                  : Colors.grey.shade800,
+                  : Colors.grey.shade400,
             ),
           ),
         );
@@ -410,6 +441,9 @@ class CarouselState extends State<Carousel> {
     );
   }
 
+  /// getWrapper to get the wrapper of the carousel images
+  /// to set the height of the carousel images if the height is not null in the product carousel options
+  /// otherwise, it will set the aspect ratio of the carousel images
   Widget getWrapper(Widget child) {
     Widget wrapper;
     if (widget.productCarouselOptions.height != null) {
@@ -419,7 +453,9 @@ class CarouselState extends State<Carousel> {
       );
     } else {
       wrapper = AspectRatio(
-        aspectRatio: widget.productCarouselOptions.aspectRatio,
+        aspectRatio: widget.multiImagesList?.isNotEmpty == true
+            ? 10 / 9
+            : widget.productCarouselOptions.aspectRatio,
         child: child,
       );
     }
