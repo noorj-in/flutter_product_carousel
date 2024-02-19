@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_product_carousel/src/product_carousel_controller.dart';
 
 class ProductCarouselOptions {
+
   /// height to set the height of the product carousel
   final double? height;
 
@@ -44,9 +45,11 @@ class ProductCarouselOptions {
   final IconData? backwardIcon;
 
   /// Preview images to show the images in the expanded view
+
   final bool previewImages;
 
   /// showNavigationIcons to show the navigation icons to the left and right of the carousel indicators
+
   final bool showNavigationIcons;
 
   /// Is favorite to show the favorite icon
@@ -73,7 +76,10 @@ class ProductCarouselOptions {
   final Duration autoPlayTimeInterval;
 
   /// auto play duration to set the duration for the auto play of the carousel images
+
   final Duration autoPlayDuration;
+
+  /// frame change duration to set the duration for the frame change of the carousel images
 
   final Duration? frameChangeDuration;
 
@@ -83,28 +89,34 @@ class ProductCarouselOptions {
   final BoxFit? boxFit;
 
   /// Determines the physics of the scroll view used to implement the scrolling behavior of the carousel
+
   final ScrollPhysics? physics;
 
   /// productCarouselController to set the controller for the product carousel
   /// if you want to use the controller, you can use the productCarouselController to control the carousel
   /// for example, you can use the controller to move to the next page or previous page
+
   final ProductCarouselController? productCarouselController;
 
   /// On tap to handle the tap of the product carousel to preview the images,
   /// if you want to use the onTap method you need to call onTap method and set the previewImages to true/false,
+
   final VoidCallback onTap;
 
   /// onPageChanged to handle the page change of the product carousel
+
   Function(int index)? onPageChanged;
 
   /// To display the favorite icon on the product carousel item, you need to provide the onFavoriteTap method
   /// On favorite tap to handle the favorite tap of the product carousel, if you want to use the favorite tap you need to call onFavoriteTap method,
   /// for example, you can use the onFavoriteTap to favorite the product
+
   final VoidCallback? onFavoriteTap;
 
   /// To display the share icon on the product carousel item, you need to provide the onShareTap method
   /// On share tap to handle the share tap, if you want to use the share tap ypu need to call onShareTap method,
   /// for example, you can use the onShareTap to share the product details
+
   final VoidCallback? onShareTap;
 
   ProductCarouselOptions({
