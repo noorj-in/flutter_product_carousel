@@ -1,3 +1,5 @@
+library imageview360;
+
 import 'dart:math';
 import 'package:flutter/material.dart';
 
