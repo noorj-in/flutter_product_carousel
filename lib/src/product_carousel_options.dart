@@ -43,7 +43,7 @@ class ProductCarouselOptions {
 
   final IconData? backwardIcon;
 
-  //Preview images to show the images in the expanded view
+  /// Preview images to show the images in the expanded view
   final bool previewImages;
 
   /// showNavigationIcons to show the navigation icons to the left and right of the carousel indicators
@@ -76,12 +76,13 @@ class ProductCarouselOptions {
   final Duration autoPlayDuration;
 
   final Duration? frameChangeDuration;
+
   /// By default the box fit is set to fill,
   /// box fit to set the box fit of the images in the carousel widget
 
   final BoxFit? boxFit;
 
-  ///Determines the physics of the scroll view used to implement the scrolling behavior of the carousel
+  /// Determines the physics of the scroll view used to implement the scrolling behavior of the carousel
   final ScrollPhysics? physics;
 
   /// productCarouselController to set the controller for the product carousel
@@ -89,8 +90,8 @@ class ProductCarouselOptions {
   /// for example, you can use the controller to move to the next page or previous page
   final ProductCarouselController? productCarouselController;
 
-  ///On tap to handle the tap of the product carousel to preview the images,
-  ///if you want to use the onTap method you need to call onTap method and set the previewImages to true/false,
+  /// On tap to handle the tap of the product carousel to preview the images,
+  /// if you want to use the onTap method you need to call onTap method and set the previewImages to true/false,
   final VoidCallback onTap;
 
   /// onPageChanged to handle the page change of the product carousel

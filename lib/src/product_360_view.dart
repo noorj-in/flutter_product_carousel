@@ -1,4 +1,3 @@
-library imageview360;
 
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ class ProductImage360View extends StatefulWidget {
     this.frameChangeDuration = const Duration(milliseconds: 90),
   }) : super(key: key);
 
+  /// imageList to set the list of images for the 360 degree view of the product
   final List<ImageProvider> imageList;
 
   /// frameChangeDuration to set the duration for the frame change of the 360 degree view of the product

@@ -134,6 +134,7 @@ class _ProductPreviewState extends State<ProductPreview>
     );
   }
 
+  /// buildHorizontalProductsImages to build the horizontal images of the product
   SingleChildScrollView buildHorizontalProductsImages({
     required List<String> imagesList,
     required Function(int) onTap,

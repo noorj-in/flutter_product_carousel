@@ -18,8 +18,10 @@ abstract class ProductCarouselController {
 }
 
 class ProductCarouselControllerImpl implements ProductCarouselController {
+  /// The page controller for the carousel
   PageController? pageController;
 
+  /// Moves the page view to the next page.
   @override
   Future<void> nextPage({Duration? duration, Curve? curve}) async {
     await pageController?.nextPage(
@@ -27,6 +29,7 @@ class ProductCarouselControllerImpl implements ProductCarouselController {
         curve: curve ?? Curves.easeInToLinear);
   }
 
+  /// Moves the page view to the previous page.
   @override
   Future<void> previousPage({Duration? duration, Curve? curve}) async {
     await pageController?.previousPage(

@@ -35,7 +35,7 @@ class ProductCarouselTest extends StatefulWidget {
 
 class _ProductCarouselTestState extends State<ProductCarouselTest> {
   final ProductCarouselController _productCarouselController =
-  ProductCarouselController();
+      ProductCarouselController();
   bool preView = false;
 
   int currentPage = 0;
