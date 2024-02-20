@@ -8,6 +8,7 @@ class ProductPreview extends StatefulWidget {
     super.key,
     required this.imagesList,
     required this.carouselOptions,
+    this.indexFromCarousel = 0,
   });
 
   /// imagesList to set the list of images for the product preview
@@ -17,6 +18,10 @@ class ProductPreview extends StatefulWidget {
   /// carouselOptions to set the options for the product carousel
 
   final ProductCarouselOptions carouselOptions;
+
+  /// indexFromCarousel to set the index of the image from the carousel
+  /// to show the preview of the image
+  final int indexFromCarousel;
 
   @override
   State<ProductPreview> createState() => _ProductPreviewState();
@@ -32,6 +37,7 @@ class _ProductPreviewState extends State<ProductPreview>
   @override
   void initState() {
     super.initState();
+    assetImage = widget.imagesList[widget.indexFromCarousel];
     _controller = AnimationController(
         duration: const Duration(milliseconds: 2000),
         vsync: this,

@@ -1,6 +1,6 @@
 name: flutter_product_carousel
 description: This package creates a user-friendly product carousel with images, indicators, and navigation buttons. Users can easily preview the images in a 360° view
-version: 0.0.3
+version: 0.0.4
 homepage: https://github.com/noorj-in/flutter_product_carousel
 repository: https://github.com/noorj-in/flutter_product_carousel
 

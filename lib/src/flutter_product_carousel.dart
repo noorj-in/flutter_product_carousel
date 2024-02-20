@@ -31,6 +31,8 @@ class ProductCarousel extends StatefulWidget {
 class ProductCarouselState extends State<ProductCarousel> {
   GlobalKey<CarouselState> carouselStateKeyKey = GlobalKey();
 
+  int currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     if (!widget.carouselOptions.previewImages) {
@@ -43,8 +45,11 @@ class ProductCarouselState extends State<ProductCarousel> {
               key: carouselStateKeyKey,
               imagesList: widget.imagesList,
               multiImagesList: widget.multiImagesList ?? [],
-              onTap: (_) {
+              onTap: (value) {
                 widget.carouselOptions.onTap();
+                setState(() {
+                  currentIndex = value;
+                });
               },
               boxFit: BoxFit.contain,
               productCarouselOptions: widget.carouselOptions,
@@ -95,6 +100,7 @@ class ProductCarouselState extends State<ProductCarousel> {
       return ProductPreview(
         imagesList: widget.imagesList,
         carouselOptions: widget.carouselOptions,
+        indexFromCarousel: currentIndex,
       );
     }
   }

@@ -29,15 +29,10 @@ way is crucial.
 
 Below are some sample screens of the product carousel in action. 
 
-<p float="left">
-<img src="screens/sample_screen_one.gif" width="20%" height="20%"  alt="" />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="screens/sample_screen_two.gif" width="20%" height="20%"  alt=""/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="screens/sample_screen_three.gif" width="20%" height="20%"  alt=""/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="screens/sample_screen_four.gif" width="20%" height="20%"  alt=""/>
-</p>
+
+|           With Product images            |             With 360° images             |               With 360° view               |              With All action              |
+|:----------------------------------------:|:----------------------------------------:|:------------------------------------------:|:-----------------------------------------:|
+| ![sample](screens/sample_screen_one.gif) | ![sample](screens/sample_screen_two.gif) | ![sample](screens/sample_screen_three.gif) | ![sample](screens/sample_screen_four.gif) |
 
 ## Getting started
 

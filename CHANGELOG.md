@@ -1,3 +1,7 @@
+## 0.0.4
+
+You can now view the current/selected indexed images or product of the Product Carousel in the Preview view.
+
 ## 0.0.3
 
 Exposed the `ProductCarouselController` to the user to control the carousel programmatically.
