@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_product_carousel/src/product_carousel_controller.dart';
 
 class ProductCarouselOptions {
-
   /// height to set the height of the product carousel
   final double? height;
 

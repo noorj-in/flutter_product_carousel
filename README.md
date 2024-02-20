@@ -90,7 +90,7 @@ import 'package:flutter_product_carousel/flutter_product_carousel.dart';
 Flutter Product Carousel is a package designed to enhance product display in mobile applications by providing an
 interactive and visually appealing carousel widget. It is tailored for showcasing products with features that enhance
 user experience and engagement, it is ideal for e-commerce apps and any application where showcasing products in an interactive and engaging way is
-crucial, For more information on how to use the package, refer to the [package documentation](https://github.com/noorj-in/flutter_product_carousel), If you have any questions, suggestions, or
+crucial, For more information on how to use the package, refer to the [package documentation](https://pub.dev/packages/flutter_product_carousel), If you have any questions, suggestions, or
 feedback, feel free to reach out to the package authors or file an issue [issues](https://github.com/noorj-in/flutter_product_carousel/issues).
 
 
